@@ -38,3 +38,4 @@ def minOperations(n):
             num_of_operations = num_of_operations + paste_operation
             flag = 1
     return num_of_operations
+
