@@ -1,19 +1,25 @@
 #!/usr/bin/node
-/* Write a script that prints all characters of a Star Wars movie */
 const request = require('request');
-const ip = 'https://swapi-api.alx-tools.com/api/films/';
-const movieId = process.argv[2];
-request(ip + movieId, async function (error, response, body) {
-  if (error) return console.error(error);
-  const characterIp = JSON.parse(body).characters;
-  for (let i = 0; i < characterIp.length; i++) {
-    await new Promise(function (resolve, reject) {
-      request(characterIp[i], (error, response, body) => {
-        if (error) return console.error(error);
-        const getName = JSON.parse(body).name;
-        console.log(getName);
-        resolve();
-      });
-    });
-  }
-});
+const API_URL = 'https://swapi-api.hbtn.io/api';
+
+if (process.argv.length > 2) {
+  request(`${API_URL}/films/${process.argv[2]}/`, (err, _, body) => {
+    if (err) {
+      console.log(err);
+    }
+    const charactersURL = JSON.parse(body).characters;
+    const charactersName = charactersURL.map(
+      url => new Promise((resolve, reject) => {
+        request(url, (promiseErr, __, charactersReqBody) => {
+          if (promiseErr) {
+            reject(promiseErr);
+          }
+          resolve(JSON.parse(charactersReqBody).name);
+        });
+      }));
+
+    Promise.all(charactersName)
+      .then(names => console.log(names.join('\n')))
+      .catch(allErr => console.log(allErr));
+  });
+}
