@@ -1,25 +1,35 @@
 #!/usr/bin/node
 const request = require('request');
-const API_URL = 'https://swapi-api.alx-tools.com/api/';
 
-if (process.argv.length > 2) {
-  request(`${API_URL}/films/${process.argv[2]}/`, (err, _, body) => {
-    if (err) {
-      console.log(err);
+const movieId = process.argv[2];
+
+const swapiUrl = `https://swapi.dev/api/films/${movieId}/`;
+
+function fetchMovieCharacters () {
+  request(swapiUrl, (error, response, body) => {
+    if (!error && response.statusCode === 200) {
+      const movieData = JSON.parse(body);
+      const characters = movieData.characters;
+
+      function printCharacterNames (index) {
+        if (index < characters.length) {
+          request(characters[index], (error, response, body) => {
+            if (!error && response.statusCode === 200) {
+              const characterData = JSON.parse(body);
+              console.log(characterData.name);
+              printCharacterNames(index + 1);
+            } else {
+              console.error(error);
+            }
+          });
+        }
+      }
+
+      printCharacterNames(0);
+    } else {
+      console.error(error);
     }
-    const charactersURL = JSON.parse(body).characters;
-    const charactersName = charactersURL.map(
-      url => new Promise((resolve, reject) => {
-        request(url, (promiseErr, __, charactersReqBody) => {
-          if (promiseErr) {
-            reject(promiseErr);
-          }
-          resolve(JSON.parse(charactersReqBody).name);
-        });
-      }));
-
-    Promise.all(charactersName)
-      .then(names => console.log(names.join('\n')))
-      .catch(allErr => console.log(allErr));
   });
 }
+
+fetchMovieCharacters();
