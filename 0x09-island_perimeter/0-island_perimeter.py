@@ -1,12 +1,12 @@
 #!/usr/bin/python3
 """
-This module computes the perimeter of an island with no lakes.
+Module for calculating the perimeter of an island with no lakes.
 """
 
 
 def island_perimeter(grid):
     """
-    Computes the perimeter of an island with no lakes.
+    Function for determining the perimeter of an island with no lakes.
 
     Args:
     - grid (list): 2D list representing the island.
